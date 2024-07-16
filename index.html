@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="3D Hand reconstruction from a single RGB image is challenging due to the 
+        articulated motion, self-occlusion, and interaction with objects. Existing SOTA methods 
+        employ attention-based transformers to learn the 3D hand pose and shape, but they
+        fail to achieve robust and accurate performance due to insufficient modeling of
+        joint spatial relations. To address this problem, we propose a novel graph-guided
+        Mamba framework, named Hamba, which bridges graph learning and state space
+        modeling. Our core idea is to reformulate Mamba's scanning into graph-guided
+        bidirectional scanning for 3D reconstruction using a few effective tokens. This
+        enables us to learn the joint relations and spatial sequences for enhancing the
+        reconstruction performance. Specifically, we design a novel Graph-guided State
+        Space (GSS) block that learns the graph-structured relations and spatial sequences
+        of joints and uses 88.5% fewer tokens than attention-based methods. Additionally,
+        we integrate the state space features and the global features using a fusion module.
+        By utilizing the GSS block and the fusion module, Hamba effectively leverages the
+        graph-guided state space modeling features and jointly considers global and local
+        features to improve performance. Extensive experiments on several benchmarks
+        and in-the-wild tests demonstrate that Hamba significantly outperforms existing
+        SOTAs, achieving the PA-MPVPE of 5.3mm and F@15mm of 0.992 on FreiHAND.
+        Hamba is currently Rank 1 in two challenging competition leaderboards on 3D
+        hand reconstruction. The code will be available upon acceptance.">
+  <meta name="keywords" content="3D Hand Reconstruction, Digital Humans, Mamba, Computer Vision, Human Sensing">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hamba: Single-view 3D Hand Reconstruction with Graph-guided Bi-Scanning Mamba</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Hamba: Single-view 3D Hand Reconstruction with Graph-guided <br>Bi-Scanning Mamba</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://www.haoyed.com/">Haoye Dong*</a>,</span>
+            <span class="author-block">
+              <a href="https://aviralchharia.github.io/">Aviral Chharia*</a>,</span>
+            <span class="author-block">
+              <a href="https://www.linkedin.com/in/wenbogou">Wenbo Gou*</a>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=3elKp9wAAAAJ">Francisco Vicente Carrasco</a>,</span><br>
+            <span class="author-block">
+              <a href="https://www.cs.cmu.edu/~ftorre/">Fernando De la Torre</a></span>            
+          </div>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Carnegie Mellon University</span>
+          </div>
+          <div>
+            <span class="author-block"><sup>*</sup>Equal Contribution</span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <h1 class="is-size-3 publication-title"><strong>arXiv 2024</strong></h1>
+          </div>
+
+          <section class="hero teaser">
+            <div class="container is-max-desktop">
+              <!-- <div class="hero-body"> -->
+                <div style="display: flex; justify-content: center;">
+                    <img src="./static/images/ri_logo_crop.png" alt="CMU Robotics Institute" style="width: 30%;">
+                    <img src="./static/images/humansensinglab.jpg" alt="Human Sensing Lab" style="width: 15%; height: 5%">
+                </div>
+              <!-- </div> -->
+            </div>
+          </section>          
+
+
+          <!-- ArXiv Link -->
+          <span class="link-block">
+            <a href="https://arxiv.org/abs/2407.09646" target="_blank"
+            class="external-link button is-normal is-rounded is-dark">
+            <span class="icon">
+              <i class="ai ai-arxiv"></i>
+            </span>
+            <span>arXiv</span>
+          </a>
+          </span>
+
+          <span class="link-block">
+            <a href="https://www.youtube.com/"
+              class="external-link button is-normal is-rounded is-dark">
+              <span class="icon">
+                  <i class="fab fa-youtube"></i>
+              </span>
+              <span>Video</span>
+            </a>
+          </span>
+
+          <!-- Code Link. -->
+          <span class="link-block">
+            <a href="https://github.com/humansensinglab/Hamba"
+                class="external-link button is-normal is-rounded is-dark">
+              <span class="icon">
+                  <i class="fab fa-github"></i>
+              </span>
+              <span>Code</span>
+              </a>
+          </span>
+
+          <!-- Hugging Face Link -->
+          <span class="link-block">
+            <a href="https://huggingface.co/" target="_blank"
+            class="external-link button is-normal is-rounded is-light">
+            <span class="icon">
+              <img src="static/images/hfbw.svg" style="width: 70%;">
+            </span>
+            <span>Demo</span>
+          </a>
+          </span>
+
+          <!-- Citation Link -->
+          <span class="link-block">
+            <a href="static/scholar.html" target="_blank"
+            class="external-link button is-normal is-rounded is-dark">
+            <span>BibTeX</span>
+          </a>
+          </span>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <div style="display: flex; justify-content: center;">
+        <img src="./static/images/Teaser.jpg" alt="Hamba Teaser" style="width: 60%; height: auto;">
+        <img src="./static/images/In-the-wild_Additional.jpg" alt="Teaser Image" style="width: 40%; height: auto;">
+      </div>
+       <!-- <div class="columns is-centered has-text-centered"> -->
+        <div class="content has-text-justified">
+        <br>
+        We propose Hamba, a novel graph-guided Mamba framework for 3D Hand Reconstruction from a single RGB image. 
+        Hamba bridges graph learning and state space modeling to achieve SOTA performance in in-the-wild 
+        scenarios, including truncations, hand-hand and hand-object interactions, different skin tones, viewpoints, 
+        challenging paintings, movie and vivid animations.
+      </div>
+     <!-- </div> -->
+    </div>
+  </div>
+</section>
+
+
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">
+          Abstract
+        </h2>
+        <div class="content has-text-justified">
+          <p>
+            3D Hand reconstruction from a single RGB image is challenging due to the articulated motion, 
+            self-occlusion, and interaction with objects. Existing SOTA methods employ attention-based 
+            transformers to learn the 3D hand pose and shape, but they fail to achieve robust and 
+            accurate performance due to insufficient modeling of joint spatial relations. To address 
+            this problem, we propose a novel graph-guided Mamba framework, named <strong>Hamba</strong>, which 
+            bridges graph learning and state space modeling. Our core idea is to reformulate Mamba's 
+            scanning into graph-guided bidirectional scanning for 3D reconstruction using a few 
+            effective tokens. This enables us to learn the joint relations and spatial sequences 
+            for enhancing the reconstruction performance. Specifically, we design a novel Graph-guided 
+            State Space (GSS) block that learns the graph-structured relations and spatial sequences 
+            of joints and uses 88.5% fewer tokens than attention-based methods. Additionally, we 
+            integrate the state space features and the global features using a fusion module. By 
+            utilizing the GSS block and the fusion module, Hamba effectively leverages the graph-guided 
+            state space modeling features and jointly considers global and local features to improve 
+            performance. Extensive experiments on several benchmarks and in-the-wild tests demonstrate 
+            that Hamba significantly outperforms existing SOTAs, achieving the PA-MPVPE of 5.3mm and 
+            F@15mm of 0.992 on FreiHAND. Hamba is currently <strong>Rank 1</strong> in two challenging 
+            competition leaderboards: <a href="https://codalab.lisn.upsaclay.fr/competitions/4318#results">HO3Dv2</a>
+            and <a href="https://codalab.lisn.upsaclay.fr/competitions/4393#results">HO3Dv3</a> Competition 
+            Leaderboards on 3D hand reconstruction.
+          </p>
+        </div>
+      
+        <table width=100%>
+          <tr>
+            <td width=50%>
+              <video loop controls muted autoplay playsinline class="bigvideo">
+                <source src="./static/images/Hamba_Video_Results.mp4" type="video/mp4">
+              </video>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">
+          Motivation
+        </h2>
+        <div style="display: flex; justify-content: center;">
+          <img src="./static/images/Concept.jpg" alt="Concept Image" style="width: 80%; height: auto;">
+        </div>
+        <div class="content has-text-justified">
+          <br> We propose graph-guided bidirectional scan which achieve effective state space modeling 
+          leveraging graph learning with few effective tokens (scanning by two snakes: 
+          <span style="color: rgb(254, 190, 62);">forward</span> and <span style="color: rgb(70, 139, 24);">backward</span> 
+          snakes).<br><br>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <div style="display: flex; justify-content: center;">
+          <img src="./static/images/Blocks.png" alt="Blocks" style="width: 80%; height: auto;">
+        </div>
+        <div class="content has-text-justified">
+          <br> Illustration of the proposed Graph-guided Bidirectional Scanning (GSS) blocks. <br><br>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">
+          Model Architecture
+        </h2>
+        <div style="display: flex; justify-content: center;">
+          <img src="./static/images/Hamba_Architecture.jpg" alt="Hamba Architecture" style="width: 80%; height: auto;">
+        </div>
+        <div class="content has-text-justified">
+          <br><p>Given a hand image <em><strong>I</strong></em>, Hamba extracts the tokens via a backbone model 
+          and downsample layers. We design a graph-guided SSM as a decoder to regress hand parameters. 
+          Here, hand joints are regressed by the Joints Regressor (JR) which is then input to the 
+          Token Sampler (TS) to sample tokens \( T_{\text{TS}} \). The joint spatial sequence tokens \( T_{\text{GSS}} \) 
+          are learned by the Graph-guided State Space (GSS) blocks. Note that GCN takes \( T_{\text{TS}} \) as 
+          input while its output is concatenated with the mean downsampled tokens. GSS leverages graph 
+          learning and SSM to capture the joint spatial relations to achieve robust 3D reconstruction.</p><br>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">
+          Contributions
+        </h2>
+        <ul>
+          <li><p>We are the first to incorporate graph learning and state space modeling for reconstructing
+            robust 3D hand mesh. Our key idea is to reformulate the Mamba scanning into graph-guided
+            bidirectional scanning for 3D reconstruction using a few effective tokens.</p></li>
+          <li><p>We propose a simple yet effective GSS block to capture structured relations between hand 
+            joints using graph convolution layers and Mamba blocks.</p></li>
+          <li><p>We introduce a token sampler that effectively boosts performance. A fusion module is also
+            introduced to further enhance performance by integrating state space tokens and global features.</p></li>
+          <li><p>Extensive experiments on multiple challenging benchmarks demonstrate Hamba's superiority over
+            current SOTAs, achieving impressive performance for in-the-wild scenarios.</p></li>
+        </ul>
+        <br>
+        We conduct complete ablation studies to validate the effectiveness of each component in our model.
+        <br>
+        <br>
+        <div style="display: flex; justify-content: center;">
+          <br><br>
+          <img src="./static/images/ablation.png" alt="Ablation Study" style="width: 70%; height: auto;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br><br>
+  
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Comparison to State-of-the-art Models</h2>
+        <p> Qualitative in-the-wild comparison of the proposed Hamba with SOTAs on HInt
+          EpicKitchensVISOR. No models including Hamba have been trained on HInt.</p><br>
+        <div style="display: flex; justify-content: center;">
+          <br><br>
+          <img src="./static/images/visual_comparison.jpg" alt="Results Image" style="width: 100%; height: auto;">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<div class="container is-max-desktop">
+  <div class="columns is-centered">
+    <div class="column is-full-width">
+      <h2 class="title is-3">Additional Results on In-the-wild data</h2>
+      <p> Qualitative in-the-wild Results on HInt-NewDays and EpicKitchensVISOR datasets, which includes 
+        highly-occluded hands, hand-hand or hand-object interactions, and truncation scenarios. We did 
+        not use the HInt dataset to train/ fine-tune Hamba.
+      </p><br>
+      <div style="display: flex; justify-content: center;">
+        <br><br>
+        <img src="./static/images/In-the-wild_Additional_2.png" alt="Hamba Teaser" style="width: 50%; height: auto;">
+        <img src="./static/images/In-the-wild_Additional_3.png" alt="Teaser Image" style="width: 50%; height: auto;">
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@misc{dong2024hambasingleview3dhand,
+      title={Hamba: Single-view 3D Hand Reconstruction with Graph-guided Bi-Scanning Mamba}, 
+      author={Haoye Dong and Aviral Chharia and Wenbo Gou and Francisco Vicente Carrasco and Fernando De la Torre},
+      year={2024},
+      eprint={2407.09646},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2407.09646}, 
+    }
+    </code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link"
+      href="https://arxiv.org/abs/2407.09646">
+     <i class="fas fa-file-pdf"></i>
+   </a>
+   <a class="icon-link" href="https://github.com/humansensinglab/Hamba" class="external-link" disabled>
+     <i class="fab fa-github"></i>
+   </a>
+      <br />
+      <p>Page template borrowed from <a href="https://nerfies.github.io/"><span class="dnerf">Nerfies</span></a>.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

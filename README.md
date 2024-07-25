@@ -15,6 +15,20 @@
 <div>
     <b>arXiv 2024</b>
 </div>
+<br>
+
+
+  <a href="https://arxiv.org/abs/2407.09646"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2407.09646-00ff00.svg"></a>
+  <a href="https://humansensinglab.github.io/Hamba"><img alt="Webpage" src="https://img.shields.io/badge/Webpage-up-yellow"></a>
+  [![GitHub Stars](https://img.shields.io/github/stars/humansensinglab/Hamba?style=social)](https://github.com/humansensinglab/Hamba)
+
+
+<p align="left">
+  <a href="https://paperswithcode.com/sota/3d-hand-pose-estimation-on-freihand?p=hamba-single-view-3d-hand-reconstruction-with"><img src="https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/hamba-single-view-3d-hand-reconstruction-with/3d-hand-pose-estimation-on-freihand"></a><br>
+    <a href="https://paperswithcode.com/sota/3d-hand-pose-estimation-on-ho-3d?p=hamba-single-view-3d-hand-reconstruction-with"><img src="https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/hamba-single-view-3d-hand-reconstruction-with/3d-hand-pose-estimation-on-ho-3d"></a><br>
+    <a href="https://paperswithcode.com/sota/3d-hand-pose-estimation-on-ho-3d-v3?p=hamba-single-view-3d-hand-reconstruction-with"><img src="https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/hamba-single-view-3d-hand-reconstruction-with/3d-hand-pose-estimation-on-ho-3d-v3"></a><br>
+    <a href="https://paperswithcode.com/sota/3d-hand-pose-estimation-on-hint-hand?p=hamba-single-view-3d-hand-reconstruction-with"><img src="https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/hamba-single-view-3d-hand-reconstruction-with/3d-hand-pose-estimation-on-hint-hand"></a><br>
+</p>  
 
 ---
 
